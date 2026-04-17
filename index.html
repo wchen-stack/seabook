@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>🚢 17詞航海傳奇：全方位修復版</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap');
+        :root { --primary: #2a5d9a; --success: #27ae60; --font-main: 'Lexend', sans-serif; }
+        body { font-family: var(--font-main); background: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #game-container { max-width: 850px; width:100%; background:white; padding:30px; border-radius:30px; box-shadow:0 15px 35px rgba(0,0,0,0.1); text-align:center; min-height: 750px; position: relative; }
+        .stage-title { color: var(--primary); font-size: 1.5rem; margin-bottom: 10px; font-weight: bold; }
+        .image-container { margin: 10px auto; width: 100%; max-width: 500px; border: 5px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden; }
+        .learning-img { width: 100%; display: block; }
+        .icon-letter { font-size: 3.5rem; line-height: 1.2; margin: 10px 0; letter-spacing: 8px; color: var(--primary); font-weight: bold; }
+        .hint-box { background:#fff9db; padding:15px 25px; border-radius:20px; font-size: 1.2rem; border-left: 10px solid #f1c40f; margin: 15px 0; text-align: left; line-height: 1.6; }
+        .video-container { margin: 15px auto; width: 100%; max-width: 450px; border-radius: 15px; overflow: hidden; }
+        .big-word { font-size: 5rem; color: var(--success); font-weight: bold; margin: 10px 0; }
+        .sentence-box { font-size: 1.4rem; color: #444; background: #e8f4fd; padding: 15px; border-radius: 15px; border-left: 5px solid var(--primary); text-align: left; }
+        button { font-family: var(--font-main); padding: 12px 25px; font-size: 1.1rem; cursor: pointer; border-radius: 12px; border: none; background: var(--primary); color: white; margin: 5px; transition: 0.3s; }
+        input { font-size: 2.5rem; width: 350px; text-align: center; padding: 10px; border: 4px solid #2a5d9a; border-radius: 15px; margin-top: 10px; outline: none; background: #fff; text-transform: lowercase; }
+        .progress { position: absolute; top: 20px; right: 30px; font-size: 1.2rem; color: #888; }
+        .btn-audio { background: #6c5ce7; font-weight: bold; margin-bottom: 10px; }
+        .btn-audio:hover { background: #5649c0; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="progress">進度: <span id="cur-p">0</span> / 17</div>
+    <div id="screen-content">
+        <h1>⚓ 航海傳奇：全感官修復系統</h1>
+        <p>圖像、提示、朗讀與拼寫已整合，請確保圖片檔名為 <strong>study.png</strong></p>
+        <button onclick="nextStep()">開始修復單字</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { w: "dive", h: "i 是一個人，👄 是他跳水時濺起的水花。", rule: "dive。看到就想到👄水花。", sentence: "He likes to dive into the sea.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxcaOLLrS8/giphy.gif" },
+        { w: "shipwrecks", h: "ship (船) + w (波浪) + recks (殘骸)。", rule: "shipwrecks。分兩部分記：ship 和 w-recks。", sentence: "Divers explore old shipwrecks.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxcaOLLrS8/giphy.gif" },
+        { w: "sank", h: "s 是蛇在求救，ank 像沉重的船錨。", rule: "sank。蛇 s，加上船錨 ank。", sentence: "The heavy ship sank quickly.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKVUn7iM8FMEU24/giphy.gif" },
+        { w: "cargo", h: "car (小車) + g🍩 (走)。貨物都在車上。", rule: "cargo。小車 car，加上走 g🍩。", sentence: "The ship carries heavy cargo.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l2Jhv9GPuGVvU70zC/giphy.gif" },
+        { w: "weapons", h: "we (我們) 拿著武器，中間有 🍎 和 p。", rule: "weapons。我們 we，加上🍎p-ons。", sentence: "The crew had no weapons.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/v2Caxp3Y8P2aA/giphy.gif" },
+        { w: "attacked", h: "at + t-a-c-k + 👄🥁。兩個 t 是劍。", rule: "attacked。兩把劍 tt，加上 👄🥁 結尾。", sentence: "The shark attacked the boat.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxcaOLLrS8/giphy.gif" },
+        { w: "silver", h: "s 是銀鏈，sil + v👄r。", rule: "silver。銀鏈 s，加上 sil-v👄r。", sentence: "The coins are made of silver.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/v2Caxp3Y8P2aA/giphy.gif" },
+        { w: "pirates", h: "p 像大錢袋，中間藏著一隻老鼠 rat。", rule: "pirates。錢袋 pi，加上老鼠 rat，再加上 es。", sentence: "The pirates found a treasure map.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/v2Caxp3Y8P2aA/giphy.gif" },
+        { w: "captured", h: "cap (帽子) + ture + 🥁。", rule: "captured。帽子 cap，加上 ture，最後🥁。", sentence: "The pirates were captured.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKL9q7R7o8Hj36E/giphy.gif" },
+        { w: "captain", h: "船長戴著帽子 cap，在 tain (音似 rain) 中指揮。", rule: "captain。帽子 cap，加上 rain 音的 tain。", sentence: "The captain leads the ship.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKL9q7R7o8Hj36E/giphy.gif" },
+        { w: "sailors", h: "他們在 sail (航行)，最後加上 ors。", rule: "sailors。航行 sail，後面加 ors。", sentence: "Sailors work hard on the boat.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l2Jhv9GPuGVvU70zC/giphy.gif" },
+        { w: "legend", h: "leg (腿) + 👄nd (結束)。傳奇故事。", rule: "legend。腿 leg，加上結束 👄nd。", sentence: "The legend of the sea is true.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l2Jhv9GPuGVvU70zC/giphy.gif" },
+        { w: "iceberg", h: "ice (冰) + 🏏erg (音似山)。", rule: "iceberg。冰 ice，加上球棒🏏開頭的山 berg。", sentence: "The ship hit a huge iceberg.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/10clvJfIPQpWes/giphy.gif" },
+        { w: "lifeboats", h: "life + 🏏🍩🍎ts (保命船)。", rule: "lifeboats。生命 life，加上 🏏🍩🍎ts。", sentence: "Everyone got into lifeboats.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKVUn7iM8FMEU24/giphy.gif" },
+        { w: "drowned", h: "🥁 🥁 中間有 row。在水裡 row，然後 👄🥁。", rule: "drowned。開頭大鼓🥁，中間row，結尾👄🥁。", sentence: "Many people drowned in the storm.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKVUn7iM8FMEU24/giphy.gif" },
+        { w: "passengers", h: "裡面有 pass (通過)。乘客。", rule: "passengers。通過 pass，加上 eng-ers。", sentence: "There are 50 passengers.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l2Jhv9GPuGVvU70zC/giphy.gif" },
+        { w: "crew", h: "c 船頭，r 划槳，👄w 海鷗飛過。", rule: "crew。船頭 c，划槳 r，海鷗👄w。", sentence: "The crew is ready to sail.", video: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRqZ3l6dzB4bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6bmZ6ZncxbzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKVUn7iM8FMEU24/giphy.gif" }
+    ];
+
+    let currentIdx = 0;
+    let stage = 0; 
+    const synth = window.speechSynthesis;
+
+    function replaceWithIcons(text) {
+        return text.split('').map(char => {
+            if (char === 'b') return '🏏';
+            if (char === 'd') return '🥁';
+            if (char === 'e') return '👄';
+            if (char === 'o') return '🍩';
+            if (char === 'a') return '🍎';
+            return char;
+        }).join('');
+    }
+
+    function speak(text, lang, rate = 0.7, callback) {
+        synth.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = lang;
+        msg.rate = rate;
+        if (callback) msg.onend = callback;
+        synth.speak(msg);
+    }
+
+    function nextStep() {
+        const screen = document.getElementById('screen-content');
+        const data = quizData[currentIdx];
+        document.getElementById('cur-p').innerText = currentIdx + 1;
+
+        if (stage === 0) {
+            // 優化介面：圖像、教學、拼寫在同一個畫面
+            screen.innerHTML = `
+                <div class="stage-title">單字修復中...</div>
+                <div class="image-container"><img src="study.png" class="learning-img" alt="study.png"></div>
+                
+                <div class="hint-box">
+                    <strong>💡 記憶法：</strong>${data.h}<br>
+                    <button class="btn-audio" onclick="speak('${data.rule}', 'zh-HK', 0.8);">🔈 廣東話教學</button>
+                    <button class="btn-audio" onclick="speak('${data.w}', 'en-GB');">🔈 英文讀音</button>
+                </div>
+
+                <div class="icon-letter">${replaceWithIcons(data.w[0])}${"_".repeat(data.w.length-1)}</div>
+                <input type="text" id="ans" placeholder="輸入單字..." autocomplete="off" onkeypress="if(event.key==='Enter')check()">
+                <br><button onclick="check()" style="background:var(--success); margin-top:15px; width:220px; font-weight:bold;">檢查答案 (Enter)</button>
+            `;
+            document.getElementById('ans').focus();
+            speak(data.w, 'en-GB');
+        } 
+        else if (stage === 1) {
+            // 成功介面
+            screen.innerHTML = `
+                <div class="stage-title">🌟 修復成功！</div>
+                <div class="big-word">${data.w}</div>
+                <div class="video-container"><img src="${data.video}" style="width:100%; border-radius:15px;"></div>
+                <div class="sentence-box"><strong>例句：</strong>${data.sentence}</div>
+                <p id="status" style="color:#666; margin-top:10px;">正在播放語境音訊...</p>
+            `;
+            
+            speak(data.w, 'en-GB', 0.6, () => {
+                setTimeout(() => {
+                    speak(data.sentence, 'en-GB', 0.7, () => {
+                        document.getElementById('status').innerText = "太棒了！準備進入下一關...";
+                        setTimeout(() => {
+                            currentIdx++;
+                            if (currentIdx < quizData.length) { 
+                                stage = 0; 
+                                nextStep(); 
+                            } else { 
+                                screen.innerHTML = "<h1>🎉 任務完成！</h1><p>你已成功修復所有航海單字。</p><button onclick='location.reload()'>重新開始</button>"; 
+                            }
+                        }, 2000);
+                    });
+                }, 800);
+            });
+        }
+    }
+
+    function check() {
+        const input = document.getElementById('ans').value.trim().toLowerCase();
+        if (input === quizData[currentIdx].w) {
+            stage = 1; 
+            nextStep();
+        } else {
+            speak("請觀察提示再試一次", "zh-HK");
+            const inputField = document.getElementById('ans');
+            inputField.style.borderColor = "#e74c3c";
+            setTimeout(() => { inputField.style.borderColor = "#2a5d9a"; }, 500);
+        }
+    }
+</script>
+</body>
+</html>
